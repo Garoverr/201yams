@@ -43,3 +43,8 @@ The software supports the following combinations:
 ```bash
 ./201yams 1 2 4 4 3 yams_4
 >> Chances to get a 4 yams: 0.46%
+```
+
+## {E} Result:
+
+![Barre de progression](https://progress-bar.dev/75/?title=Complet&color=4CAF50)
