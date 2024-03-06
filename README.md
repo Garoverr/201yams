@@ -47,4 +47,4 @@ The software supports the following combinations:
 
 ## {E} Result:
 
-![Barre de progression](https://progress-bar.dev/75/?title=Complet&color=4CAF50)
+![Barre de progression](https://progress-bar.dev/100/?title=Marvin&color=4CAF50)
