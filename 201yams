@@ -1,0 +1,123 @@
+#!/usr/bin/env python3
+
+import itertools
+import math
+import sys
+
+def binomial(n, k):
+    return math.factorial(n) / (math.factorial(k) * math.factorial(n - k)) * pow(1 / 6, k) * pow(5 / 6, n - k)
+
+def calc_prob(expected, number, dice_list):
+    prob = 0.0
+    dice_count = dice_list.count(number)
+    if dice_count >= expected:
+        prob = 1.0
+    else:
+        for i in range(expected - dice_count, 5 - dice_count + 1):
+            prob += binomial(5 - dice_count, i)
+    prob *= 100.0
+    return prob
+
+def calc_straight_prob(number, dice_list):
+    prob = 0.0
+    count = 0
+    for i in range(0, 5):
+        if dice_list.count(number) >= 1:
+            count += 1
+        number -= 1
+    if count == 5:
+        prob = 1.0
+    else:
+        prob = (1.0 / 6.0**(int(5.0 - count))) * math.factorial(int(5.0 - count))
+    if count == 0:
+        prob *= 2
+    return prob * 100
+
+def calc_full_prob(number1, number2, dice_list):
+    prob = 1.0
+    count1 = dice_list.count(number1)
+    count2 = dice_list.count(number2)
+    if number1 == number2:
+        exit(84)
+    if count1 > 3:
+        count1 = 3
+    if count2 > 2:
+        count2 = 2
+    fullhouse = float(math.factorial(5 - count1 - count2) / (math.factorial(3 - count1) * math.factorial(2 - count2)))
+    return (fullhouse / pow(6, 5 - count1 - count2)) * 100.0
+
+def compute_calculation(args):
+    dice_list = list(map(int, args[1:6]))
+    comb = args[6]
+
+    if comb.startswith("pair"):
+        print("Chances to get a " + comb[5] + " pair: %0.2f%%" % calc_prob(2, int(comb[5]), dice_list))
+    elif comb.startswith("three"):
+        print("Chances to get a " + comb[6] + " three-of-a-kind: %0.2f%%" % calc_prob(3, int(comb[6]), dice_list))
+    elif comb.startswith("four"):
+        print("Chances to get a " + comb[5] + " four-of-a-kind: %0.2f%%" % calc_prob(4, int(comb[5]), dice_list))
+    elif comb.startswith("yams"):
+        print("Chances to get a " + comb[5] + " yams: %0.2f%%" % calc_prob(5, int(comb[5]), dice_list))
+    elif comb.startswith("straight"):
+        print("Chances to get a " + comb[9] + " straight: %0.2f%%" % calc_straight_prob(int(comb[9]), dice_list))
+    elif comb.startswith("full"):
+        print("Chances to get a " + comb[5] + " full of " + comb[7] + ": %0.2f%%" % calc_full_prob(int(comb[5]), int(comb[7]), dice_list))
+
+
+def check_die_args(args) -> int:
+    try:
+        _dies = list(map(int, args[1:6]))
+    except ValueError:
+        return usage()
+    if (all(0 <= x <= 6 for x in _dies) and (check_combi_args(args) == 0)):
+        return 0
+    return usage()
+
+
+def check_combi_args(args) -> int:
+    _combination = ["pair", "three", "four", "straight", "yams"]
+
+    if args[6].startswith("full"):
+        xf = args[6][-3]
+        yf = args[6][-1]
+        if ((xf.isdigit() and 1 <= int(xf) <= 6) and (yf.isdigit() and 1 <= int(yf) <= 6) and (args[6][-2] == '_' and args[6][-4] == '_' ) ):
+            return 0
+    if args[6].startswith("straight"):
+        x = args[6][-1]
+        if x.isdigit() and 5 > int(x):
+            return 84
+    if args[6][:-2] not in _combination or args[6][-2] != '_':
+        return 84
+    x = args[6][-1]
+    if x.isdigit() and 1 <= int(x) <= 6:
+        return 0
+    return 84
+
+
+def usage() -> int:
+    print(
+"""USAGE
+\t./201yams d1 d2 d3 d4 d5 c\n
+DESCRIPTION
+\td1\tvalue of the first die (0 if not thrown)
+\td2\tvalue of the second die (0 if not thrown)
+\td3\tvalue of the third die (0 if not thrown)
+\td4\tvalue of the fourth die (0 if not thrown)
+\td5\tvalue of the fifth die (0 if not thrown)
+\tc\texpected combination"""
+        )
+    return (84)
+
+
+def main() -> int:
+    if len(sys.argv) != 7:
+        return usage()
+    else :
+        if (check_die_args(sys.argv) == 0):
+            compute_calculation(sys.argv)
+        else:
+            return 84
+        return 0
+    
+if __name__ == "__main__":
+    sys.exit(main())
